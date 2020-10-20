@@ -117,6 +117,18 @@ func (b *branch) setKey(key []byte) {
 	b.key = key
 }
 
+// Small helper to return value of node
+func getValue(n node) []byte {
+	switch t := n.(type) {
+	case *branch:
+		return t.value
+	case *leaf:
+		return t.value
+	}
+	
+	return nil
+}
+
 // Encode is the high-level function wrapping the encoding for different node types
 // encoding has the following format:
 // NodeHeader | Extra partial key length | Partial Key | Value

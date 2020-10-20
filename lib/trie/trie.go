@@ -246,18 +246,12 @@ func (t *Trie) insert(parent node, key []byte, value node) (n node, err error) {
 	case *branch:
 		n, err = t.updateBranch(p, key, value)
 	case nil:
-		switch v := value.(type) {
-		case *branch:
-			v.key = key
-			n = v
-		case *leaf:
-			v.key = key
-			n = v
-		}
+		value.setKey(key)
+		n = value
 	case *leaf:
 		// if a value already exists in the trie at this key, overwrite it with the new value
 		if p.value != nil && bytes.Equal(p.key, key) {
-			p.value = value.(*leaf).value
+			p.value = getValue(value)
 			return p, nil
 		}
 
@@ -270,7 +264,7 @@ func (t *Trie) insert(parent node, key []byte, value node) (n node, err error) {
 
 		// value goes at this branch
 		if len(key) == length {
-			br.value = value.(*leaf).value
+			br.value = getValue(value)
 
 			// if we are not replacing previous leaf, then add it as a child to the new branch
 			if len(parentKey) > len(key) {
